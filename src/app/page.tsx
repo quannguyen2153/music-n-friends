@@ -1,10 +1,19 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { auth, signOut } from "@/auth";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  if (!session) {
+    return redirect("/login");
+  }
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <h1>Welcome {session.user?.name},</h1>
+        <h2>aka: {session.user?.email}</h2>
         <Image
           className={styles.logo}
           src="/next.svg"
@@ -89,6 +98,16 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
+        <form
+          action={async () => {
+            "use server";
+            await signOut({
+              redirectTo: "/login",
+            });
+          }}
+        >
+          <button type="submit">Signout</button>
+        </form>
       </footer>
     </div>
   );
