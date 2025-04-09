@@ -33,7 +33,7 @@ export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
     }
 
     const res = await fetch(
-      `http://localhost:3000/api/youtube/playlist/${playlistId}?${params.toString()}`,
+      `/api/youtube/playlist/${playlistId}?${params.toString()}`,
       {
         method: "GET",
         headers: {
