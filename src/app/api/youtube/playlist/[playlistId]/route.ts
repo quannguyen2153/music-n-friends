@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { playlistId: string } }
+  { params }: { params: Promise<{ playlistId: string }> }
 ) {
   const { playlistId } = await params;
   const authHeader = req.headers.get("authorization");

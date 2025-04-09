@@ -53,9 +53,7 @@ export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
 
   useEffect(() => {
     fetchData();
-  }, []);
 
-  useEffect(() => {
     const handleScroll = () => {
       const list = listRef.current;
       if (!list) return;
