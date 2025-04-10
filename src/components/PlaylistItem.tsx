@@ -1,7 +1,6 @@
 import { PlaylistItem as PlaylistItemType } from "@/types/PlaylistItem";
 import {
   Avatar,
-  Link,
   ListItem,
   ListItemAvatar,
   ListItemText,
@@ -10,11 +9,25 @@ import {
 
 type PlaylistItemProps = {
   playlistItem: PlaylistItemType;
+  onVideoClick: (index: number) => void;
 };
 
-export default function PlaylistItem({ playlistItem }: PlaylistItemProps) {
+export default function PlaylistItem({
+  playlistItem,
+  onVideoClick,
+}: PlaylistItemProps) {
   return (
-    <ListItem alignItems="center" sx={{ color: "#fff" }}>
+    <ListItem
+      alignItems="center"
+      onClick={() => onVideoClick(playlistItem.snippet.position)}
+      sx={{
+        color: "#fff",
+        cursor: "pointer",
+        "&:hover": {
+          backgroundColor: "rgba(255, 255, 255, 0.08)",
+        },
+      }}
+    >
       <Typography
         variant="body1"
         sx={{ width: 20, mr: 2, textAlign: "center" }}
@@ -41,15 +54,7 @@ export default function PlaylistItem({ playlistItem }: PlaylistItemProps) {
 
       <ListItemText
         primary={
-          <Link
-            href={`https://www.youtube.com/watch?v=${playlistItem.snippet.resourceId.videoId}`}
-            target="_blank"
-            rel="noopener"
-            underline="hover"
-            sx={{ color: "#fff", fontWeight: 500 }}
-          >
-            {playlistItem.snippet.title}
-          </Link>
+          <Typography variant="body1">{playlistItem.snippet.title}</Typography>
         }
         secondary={
           <Typography variant="caption" sx={{ color: "#aaa" }}>

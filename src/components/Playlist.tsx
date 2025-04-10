@@ -1,60 +1,29 @@
 "use client";
 
-import { Box, List } from "@mui/material";
+import { Box, LinearProgress, List, ListItem } from "@mui/material";
 import { PlaylistItem as PlaylistItemType } from "@/types/PlaylistItem";
 import PlaylistItem from "@/components/PlaylistItem";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 type PlaylistProps = {
-  accessToken: string;
-  playlistId: string;
+  playlist: PlaylistItemType[];
+  fetchPlaylist: () => Promise<void>;
+  autoFetch: boolean;
+  onVideoClick: (index: number) => void;
 };
 
-export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
-  const [playlist, setPlaylist] = useState<PlaylistItemType[]>([]);
+export default function Playlist({
+  playlist,
+  fetchPlaylist,
+  autoFetch,
+  onVideoClick,
+}: PlaylistProps) {
   const listRef = useRef<HTMLUListElement>(null);
-  const totalResults = useRef(Number.MAX_SAFE_INTEGER);
-  const loadingRef = useRef(false);
-  const nextPageTokenRef = useRef("");
-
-  const fetchData = async () => {
-    if (
-      loadingRef.current ||
-      !accessToken ||
-      totalResults.current <= playlist.length
-    )
-      return;
-
-    loadingRef.current = true;
-
-    const params = new URLSearchParams();
-    if (nextPageTokenRef.current) {
-      params.append("pageToken", nextPageTokenRef.current);
-    }
-
-    const res = await fetch(
-      `/api/youtube/playlist/${playlistId}?${params.toString()}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    const data = await res.json();
-
-    totalResults.current = data.pageInfo.totalResults;
-    setPlaylist((prev) => [...prev, ...(data.items || [])]);
-    nextPageTokenRef.current = data.nextPageToken || "";
-
-    loadingRef.current = false;
-  };
 
   useEffect(() => {
-    fetchData();
-
     const handleScroll = () => {
+      if (!autoFetch) return;
+
       const list = listRef.current;
       if (!list) return;
 
@@ -62,8 +31,8 @@ export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
       const isNearBottom =
         list.scrollHeight - list.scrollTop - list.clientHeight < threshold;
 
-      if (isNearBottom && nextPageTokenRef.current) {
-        fetchData();
+      if (isNearBottom) {
+        fetchPlaylist();
       }
     };
 
@@ -84,7 +53,6 @@ export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
       sx={{
         bgcolor: "#1e1e1e",
         height: "100vh",
-        maxWidth: 600,
         display: "flex",
         flexDirection: "column",
       }}
@@ -114,9 +82,17 @@ export default function Playlist({ accessToken, playlistId }: PlaylistProps) {
       >
         {playlist.map((item, index) => (
           <React.Fragment key={index}>
-            <PlaylistItem playlistItem={item} />
+            <PlaylistItem playlistItem={item} onVideoClick={onVideoClick} />
           </React.Fragment>
         ))}
+        {autoFetch && (
+          <ListItem sx={{ px: 2 }}>
+            <LinearProgress
+              color="inherit"
+              sx={{ width: "100%", bgcolor: "#333" }}
+            />
+          </ListItem>
+        )}
       </List>
     </Box>
   );
