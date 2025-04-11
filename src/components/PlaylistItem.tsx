@@ -6,16 +6,21 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import { GraphicEq } from "@mui/icons-material";
 
 type PlaylistItemProps = {
   playlistItem: PlaylistItemType;
   onVideoClick: (index: number) => void;
+  playingVideoIndex: number;
 };
 
 export default function PlaylistItem({
   playlistItem,
   onVideoClick,
+  playingVideoIndex,
 }: PlaylistItemProps) {
+  const isPlaying = playingVideoIndex === playlistItem.snippet.position;
+
   return (
     <ListItem
       alignItems="center"
@@ -23,6 +28,7 @@ export default function PlaylistItem({
       sx={{
         color: "#fff",
         cursor: "pointer",
+        backgroundColor: isPlaying ? "rgba(255, 255, 255, 0.1)" : "transparent",
         "&:hover": {
           backgroundColor: "rgba(255, 255, 255, 0.08)",
         },
@@ -32,7 +38,11 @@ export default function PlaylistItem({
         variant="body1"
         sx={{ width: 20, mr: 2, textAlign: "center" }}
       >
-        {playlistItem.snippet.position + 1}
+        {isPlaying ? (
+          <GraphicEq fontSize="small" sx={{ color: "#1db954" }} />
+        ) : (
+          playlistItem.snippet.position + 1
+        )}
       </Typography>
 
       <ListItemAvatar sx={{ mr: 2 }}>
@@ -42,7 +52,7 @@ export default function PlaylistItem({
           sx={{
             width: 80,
             height: 45,
-            bgcolor: "#000", // fallback bg in case image fails
+            bgcolor: "#000",
             img: {
               objectFit: "cover",
               width: "100%",

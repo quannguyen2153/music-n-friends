@@ -1,53 +1,92 @@
-import { auth, signOut } from "@/auth";
-import PlaylistPlayer from "@/components/PlaylistPlayer";
-import { Logout } from "@mui/icons-material";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Typography,
+  Link,
+} from "@mui/material";
 
-export default async function Home() {
+type Playlist = {
+  id: string;
+  thumbnail: string;
+  title: string;
+  channel: string;
+};
+
+const mockPlaylists: Playlist[] = [
+  {
+    id: "PLf2CUDZ0F9o5OIPIFWEOz20Ps7Z_XCvee",
+    thumbnail: "https://i.ytimg.com/vi/PCJXyv2VtH0/maxresdefault.jpg",
+    title: "Chill Chinese Songs",
+    channel: "Nguyễn Minh Quân",
+  },
+];
+
+export default async function PlaylistPage() {
   const session = await auth();
   if (!session) {
     return redirect("/login");
   }
 
+  const playlists = mockPlaylists;
+
   return (
-    <>
-      <PlaylistPlayer
-        accessToken={session.accessToken as string}
-        playlistId="PLf2CUDZ0F9o7-UvQzmXZZTir48K_ySGA8"
-      />
-      <form
-        action={async () => {
-          "use server";
-          await signOut({
-            redirectTo: "/login",
-          });
-        }}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-        }}
+    <Box sx={{ padding: 4 }}>
+      <Grid
+        container
+        spacing={4}
+        justifyContent="space-evenly"
+        alignItems="stretch"
+        sx={{ height: "100%" }}
       >
-        <button
-          type="submit"
-          style={{
-            backgroundColor: "#1e1e1e",
-            color: "white",
-            border: "none",
-            width: "48px",
-            height: "48px",
-            borderRadius: "50%",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)",
-          }}
-          title="Logout"
-        >
-          <Logout />
-        </button>
-      </form>
-    </>
+        {playlists.map((playlist) => (
+          <Grid
+            container
+            size={4}
+            key={playlist.id}
+            justifyContent="space-evenly"
+            alignItems="stretch"
+          >
+            <Link
+              href={`/playlist/${playlist.id}`}
+              style={{ textDecoration: "none", width: "100%" }}
+            >
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  height: "100%",
+                  width: "100%",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "scale(1.03)",
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  height="180"
+                  image={playlist.thumbnail}
+                  alt={playlist.title}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div">
+                    {playlist.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {playlist.channel}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Link>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 }

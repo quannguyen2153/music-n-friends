@@ -10,6 +10,7 @@ type PlaylistProps = {
   fetchPlaylist: () => Promise<void>;
   autoFetch: boolean;
   onVideoClick: (index: number) => void;
+  playingVideoIndex: number;
 };
 
 export default function Playlist({
@@ -17,6 +18,7 @@ export default function Playlist({
   fetchPlaylist,
   autoFetch,
   onVideoClick,
+  playingVideoIndex,
 }: PlaylistProps) {
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -52,7 +54,7 @@ export default function Playlist({
     <Box
       sx={{
         bgcolor: "#1e1e1e",
-        height: "100vh",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
       }}
@@ -82,7 +84,7 @@ export default function Playlist({
       >
         {playlist.map((item, index) => (
           <React.Fragment key={index}>
-            <PlaylistItem playlistItem={item} onVideoClick={onVideoClick} />
+            <PlaylistItem playlistItem={item} onVideoClick={onVideoClick} playingVideoIndex={playingVideoIndex} />
           </React.Fragment>
         ))}
         {autoFetch && (
